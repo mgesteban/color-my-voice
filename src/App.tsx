@@ -198,6 +198,18 @@ function AppContent() {
     setActiveVisualToken(null);
   };
 
+  const handleKioskReset = () => {
+    // Clear demographic metadata and consent state to prepare for a fresh participant session!
+    localStorage.removeItem('chromacoustic_consented');
+    localStorage.removeItem('chromacoustic_share_data');
+    localStorage.removeItem('chromacoustic_user_meta');
+    setUserMeta({});
+    setShareDataConsent(false);
+    setSessionSummary(null);
+    setActiveVisualToken(null);
+    setAppState('onboarding');
+  };
+
   const handleResearcherExport = () => {
     ResearchApi.triggerDatasetDownload();
   };
@@ -374,6 +386,9 @@ function AppContent() {
             </button>
             <button onClick={handleReset} className="btn-secondary">
               {t('btnReset')}
+            </button>
+            <button onClick={handleKioskReset} className="btn-secondary" style={{ border: '1px dashed rgba(255, 255, 255, 0.25)', color: '#a7f3d0' }}>
+              👤 {t('btnKioskReset')}
             </button>
           </div>
         </section>
