@@ -1,11 +1,11 @@
-# 🔮 color my voice
+# color my voice
 ### *A Breathtaking Voice-to-Visual Synesthesia PWA & GDPR-Sanitized SQLite Research Data Engine*
 
 Built for the **Google I/O DeepMind Hackathon 2026**, **color my voice** turns human speech prosody into dynamic, frameable sound art, while simultaneously crowdsourcing anonymized acoustic summaries for global cross-modal science.
 
 ---
 
-## 🌟 Impact Potential (20%) & Real-World Utility
+## Impact Potential (20%) & Real-World Utility
 
 ### Why We Built It & Who It Is For
 In cognitive science and speech therapy, **vocal prosody**—the rhythm, stress, and intonation of speech—is known as the "music of language." It carries our emotional intent, yet traditional studies on cross-modal perception (synesthesia) have been bottlenecked by small, Western-centric laboratory cohorts due to high hardware and test friction. 
@@ -22,7 +22,7 @@ We built **color my voice** to democratize this research at a global scale. It i
 
 ---
 
-## 🤖 Multi-Agent Orchestration & Development Workflow
+## Multi-Agent Orchestration & Development Workflow
 
 This application was engineered using a cutting-edge **Multi-Agent AI Orchestration** system. To guarantee a highly cohesive codebase on the first try, our development process operated on a contract-first architecture:
 
@@ -60,7 +60,7 @@ graph TD
 
 ---
 
-## 🛠️ Key Technical Features
+## Key Technical Features
 
 *   **Real-Time In-Browser Prosody Extraction**: Captured via Web Audio API, extracting Pitch (F0), Timbre Centroid (brightness), Cadence Speed, and Pause Ratio using a optimized, noise-filtering pipeline.
 *   **Rimsky-Korsakov Chromesthesia Map**: Pitch konturs resolve to classical HSL profiles, while Loudness modulates Lightness and Timbre modulates Saturation.
@@ -70,7 +70,7 @@ graph TD
 
 ---
 
-## 🚀 Quick Start Guide
+## Quick Start Guide
 
 ### 1. Launch the Backend Server
 ```bash
