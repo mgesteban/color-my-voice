@@ -76,6 +76,7 @@ export const ResearchForm: React.FC<ResearchFormProps> = ({ onSubmit, onSkip }) 
               <option value="">{t('placeholderSelect')}</option>
               <option value="Romance">Romance (Spanish, French, Italian, Portuguese...)</option>
               <option value="Germanic">Germanic (English, German, Dutch, Swedish...)</option>
+              <option value="Austronesian">Austronesian (Tagalog, Malay, Indonesian...)</option>
               <option value="Sino-Tibetan">Sino-Tibetan (Mandarin, Cantonese, Burmese...)</option>
               <option value="Indo-Aryan">Indo-Aryan (Hindi, Urdu, Bengali, Punjabi...)</option>
               <option value="Semitic">Semitic (Arabic, Hebrew, Amharic...)</option>
@@ -89,15 +90,22 @@ export const ResearchForm: React.FC<ResearchFormProps> = ({ onSubmit, onSkip }) 
             <label htmlFor="native-lang" className="form-label">
               {t('labelNativeLanguage')}
             </label>
-            <input
-              type="text"
+            <select
               id="native-lang"
               value={nativeLanguage}
               onChange={(e) => setNativeLanguage(e.target.value)}
-              className="form-input"
-              placeholder="e.g. English, Español, Deutsch"
-              maxLength={50}
-            />
+              className="form-select"
+            >
+              <option value="">{t('placeholderSelect')}</option>
+              <option value="Tagalog">Tagalog</option>
+              <option value="English">English</option>
+              <option value="Español">Español</option>
+              <option value="Malay">Malay</option>
+              <option value="French">French</option>
+              <option value="German">German</option>
+              <option value="Mandarin">Mandarin</option>
+              <option value="Other">Other</option>
+            </select>
           </div>
 
           {/* Broad Region */}
