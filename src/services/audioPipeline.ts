@@ -100,12 +100,14 @@ export class AudioPipeline {
           const rawRms = isNaN(features.rms) || !isFinite(features.rms) ? 0.0 : features.rms;
           const rawZcr = isNaN(features.zcr) || !isFinite(features.zcr) ? 0.0 : features.zcr;
 
-          // Normalize centroid (typically 0..Nyquist frequency, i.e., sampleRate/2)
-          const maxCentroid = sampleRate / 2;
-          const normalizedCentroid = Math.min(1.0, rawCentroid / (maxCentroid * 0.4)); // scale for human vocal range
+          // Normalize centroid (convert bin index to Hz and scale to human vocal range)
+          const binFreqResolution = sampleRate / this.analyser.fftSize;
+          const centroidHz = rawCentroid * binFreqResolution;
+          // Map 300Hz..3000Hz to 0.0..1.0
+          const normalizedCentroid = Math.max(0.0, Math.min(1.0, (centroidHz - 300) / (3000 - 300)));
 
           // Normalize rolloff
-          const normalizedRolloff = Math.min(1.0, rawRolloff / maxCentroid);
+          const normalizedRolloff = Math.min(1.0, rawRolloff / (sampleRate / 2));
 
           // Voice Quality Proxies (Jitter & Shimmer)
           const jitterProxy = Math.abs(rawZcr - (this.frames[this.frames.length - 1]?.zcr || 0)) * 0.002;

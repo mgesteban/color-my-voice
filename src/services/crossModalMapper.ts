@@ -120,13 +120,13 @@ export function mapFrameToVisualToken(
   let patternId = 'fluid'; // velvet
   const safeFlatness = isNaN(frame.spectralFlatness) || !isFinite(frame.spectralFlatness) ? 0.0 : frame.spectralFlatness;
 
-  if (safeCentroid > 0.55 && (safeJitter > 0.025 || safeFlatness > 0.45)) {
+  if (safeCentroid > 0.40 && (safeJitter > 0.015 || safeFlatness > 0.35)) {
     patternId = 'spiky';     // sandpaper
-  } else if (safeRms < 0.02 && safeFlatness > 0.45) {
+  } else if (safeRms < 0.03 && safeFlatness > 0.35) {
     patternId = 'airy';      // airy cloud
-  } else if (safeRms > 0.07 && (f0Hz !== null && f0Hz < 160) && safeJitter < 0.02) {
+  } else if (safeRms > 0.05 && (f0Hz !== null && f0Hz < 150) && safeJitter < 0.02) {
     patternId = 'viscous';   // maple syrup
-  } else if (safeCentroid > 0.45 && safeFlatness < 0.25) {
+  } else if (safeCentroid > 0.35 && safeFlatness < 0.25) {
     patternId = 'crisp';     // brittle glass
   }
 
@@ -157,19 +157,19 @@ export function getSynestheticProfile(summary: any): SynestheticProfile {
   let taste = "Warm buttered crusty bread soaked in rich tomato soup";
   let mouthfeel = "Creamy, comforting, and highly viscous";
 
-  if (centroid > 0.55 && (jitter > 0.025 || flatness > 0.45)) {
+  if (centroid > 0.40 && (jitter > 0.015 || flatness > 0.35)) {
     texture = "Coarse volcanic sandpaper";
     taste = "Crisp seasoned pizza combined with tangy cheese Doritos";
     mouthfeel = "Crunchy, salty, and sharp";
-  } else if (rms < 0.025 && flatness > 0.45) {
+  } else if (rms < 0.03 && flatness > 0.35) {
     texture = "Light airy morning mist";
     taste = "Sweet peach iced tea combined with fresh eucalyptus mint";
     mouthfeel = "Cooling, sweet, and refreshing";
-  } else if (rms > 0.07 && f0 < 160 && jitter < 0.02) {
+  } else if (rms > 0.05 && f0 < 150 && jitter < 0.02) {
     texture = "Thick golden maple syrup";
     taste = "Earthy pinto beans with ground cumin and dry desert dust";
     mouthfeel = "Powdery, dry, and highly savory";
-  } else if (centroid > 0.45 && flatness < 0.25) {
+  } else if (centroid > 0.35 && flatness < 0.25) {
     texture = "Brittle crystalline glass";
     taste = "Tangy tomato slices on thin salted butter crackers";
     mouthfeel = "Crisp, clean, and mildly tart";
