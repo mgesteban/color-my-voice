@@ -120,14 +120,22 @@ export function mapFrameToVisualToken(
   let patternId = 'fluid'; // velvet
   const safeFlatness = isNaN(frame.spectralFlatness) || !isFinite(frame.spectralFlatness) ? 0.0 : frame.spectralFlatness;
 
-  if (safeRms < 0.035 && safeFlatness > 0.45) {
+  if (safeRms < 0.03 && safeFlatness > 0.40) {
     patternId = 'airy';      // airy cloud
-  } else if (safeCentroid > 0.55 && safeJitter > 0.06) {
-    patternId = 'spiky';     // sandpaper
-  } else if (f0Hz !== null && f0Hz > 0 && f0Hz < 145 && safeCentroid < 0.38) {
-    patternId = 'viscous';   // maple syrup
-  } else if (f0Hz !== null && f0Hz >= 145 && safeCentroid >= 0.38) {
-    patternId = 'crisp';     // brittle glass
+  } else if (f0Hz !== null && f0Hz > 0) {
+    if (f0Hz < 145) {
+      if (safeCentroid < 0.40) {
+        patternId = 'viscous';   // maple syrup
+      } else {
+        patternId = 'spiky';     // sandpaper
+      }
+    } else {
+      if (safeCentroid < 0.40) {
+        patternId = 'fluid';     // velvet
+      } else {
+        patternId = 'crisp';     // brittle glass
+      }
+    }
   }
 
   return {
@@ -196,10 +204,9 @@ export function getSynestheticProfile(summary: any): SynestheticProfile {
   const rms = summary?.loudness?.mean || 0;
   const centroid = summary?.timbre?.centroidMean || 0;
   const flatness = summary?.timbre?.flatnessMean || 0;
-  const jitter = summary?.voiceQuality?.jitterMean || 0;
 
-  // 1. Extreme Secondary Modifiers: Whispers and Screams/Extremely Harsh Speech
-  if (rms < 0.035 && flatness > 0.45) {
+  // 1. Whisper / Quiet speech fallback
+  if (rms < 0.03 && flatness > 0.40) {
     return {
       id: 'airy',
       texture: "Light airy morning mist",
@@ -207,36 +214,51 @@ export function getSynestheticProfile(summary: any): SynestheticProfile {
       mouthfeel: "Cooling, sweet, and refreshing"
     };
   }
-  
-  if (centroid > 0.55 && jitter > 0.06) {
-    return {
-      id: 'spiky',
-      texture: "Coarse volcanic sandpaper",
-      taste: "Crisp seasoned pizza combined with tangy cheese Doritos",
-      mouthfeel: "Crunchy, salty, and sharp"
-    };
+
+  // 2. Primary Classification Grid (F0 Pitch vs. Timbre Centroid)
+  if (f0 > 0) {
+    if (f0 < 145) {
+      // Male voice pitch
+      if (centroid < 0.40) {
+        // Deep, rich, soft resonance
+        return {
+          id: 'viscous',
+          texture: "Thick golden maple syrup",
+          taste: "Earthy pinto beans with ground cumin and dry desert dust",
+          mouthfeel: "Powdery, dry, and highly savory"
+        };
+      } else {
+        // Bright, projected, harsh or gravelly resonance
+        return {
+          id: 'spiky',
+          texture: "Coarse volcanic sandpaper",
+          taste: "Crisp seasoned pizza combined with tangy cheese Doritos",
+          mouthfeel: "Crunchy, salty, and sharp"
+        };
+      }
+    } else {
+      // Female voice pitch
+      if (centroid < 0.40) {
+        // Warm, soft, chesty female voice
+        return {
+          id: 'fluid',
+          texture: "Warm liquid velvet",
+          taste: "Warm buttered crusty bread soaked in rich tomato soup",
+          mouthfeel: "Creamy, comforting, and highly viscous"
+        };
+      } else {
+        // Bright, melodic, high formant female voice (e.g. Tagalog speaking, clear projection!)
+        return {
+          id: 'crisp',
+          texture: "Brittle crystalline glass",
+          taste: "Tangy tomato slices on thin salted butter crackers",
+          mouthfeel: "Crisp, clean, and mildly tart"
+        };
+      }
+    }
   }
 
-  // 2. Primary Vocal Dimorphism: Deep Male (Maple Syrup) vs. Bright Female (Crystalline Glass)
-  if (f0 > 0 && f0 < 145 && centroid < 0.38) {
-    return {
-      id: 'viscous',
-      texture: "Thick golden maple syrup",
-      taste: "Earthy pinto beans with ground cumin and dry desert dust",
-      mouthfeel: "Powdery, dry, and highly savory"
-    };
-  }
-  
-  if (f0 >= 145 && centroid >= 0.38) {
-    return {
-      id: 'crisp',
-      texture: "Brittle crystalline glass",
-      taste: "Tangy tomato slices on thin salted butter crackers",
-      mouthfeel: "Crisp, clean, and mildly tart"
-    };
-  }
-
-  // 3. Default Balanced Voice Profile
+  // 3. Fallback for unvoiced or silent recording
   return {
     id: 'fluid',
     texture: "Warm liquid velvet",
