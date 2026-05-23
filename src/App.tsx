@@ -241,7 +241,7 @@ function AppContent() {
       ctx.font = 'bold 54px "Outfit", sans-serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'top';
-      ctx.fillText('color my voice', 600, 85);
+      ctx.fillText('Color My Voice', 600, 85);
 
       ctx.fillStyle = profileColor;
       ctx.font = '700 16px "Plus Jakarta Sans", sans-serif';

@@ -1,7 +1,7 @@
-# color my voice
+# Color My Voice
 ### *A Breathtaking Voice-to-Visual Synesthesia PWA & GDPR-Sanitized SQLite Research Data Engine*
 
-Built for the **Google I/O DeepMind Hackathon 2026**, **color my voice** turns human speech prosody into dynamic, frameable sound art, while simultaneously crowdsourcing anonymized acoustic summaries for global cross-modal science.
+Built for the **Google I/O DeepMind Hackathon 2026**, **Color My Voice** turns human speech prosody into dynamic, frameable sound art, while simultaneously crowdsourcing anonymized acoustic summaries for global cross-modal science.
 
 ---
 
@@ -10,12 +10,12 @@ Built for the **Google I/O DeepMind Hackathon 2026**, **color my voice** turns h
 ### Why We Built It & Who It Is For
 In cognitive science and speech therapy, **vocal prosody**—the rhythm, stress, and intonation of speech—is known as the "music of language." It carries our emotional intent, yet traditional studies on cross-modal perception (synesthesia) have been bottlenecked by small, Western-centric laboratory cohorts due to high hardware and test friction. 
 
-We built **color my voice** to democratize this research at a global scale. It is a dual-nature instrument designed for:
+We built **Color My Voice** to democratize this research at a global scale. It is a dual-nature instrument designed for:
 *   **Participants**: A delightful, instantly rewarding creative tool that turns their voice into custom-colored, frameable physical art prints.
 *   **Neuroscientists & Cognitive Researchers**: A clean, GDPR-compliant, child-safe crowdsourcing engine collecting precise acoustic summaries to study cross-modal mapping across diverse languages.
 
 ### Long-Term Value & Real-World Clinical Utility (Beyond the Hackathon)
-**color my voice** has immediate, transformative utility in the real world:
+**Color My Voice** has immediate, transformative utility in the real world:
 1.  **Speech Therapy & Neuro-Rehabilitation**: It acts as a **visual biofeedback tool** for stroke survivors and individuals recovering from vocal impediments. Patients can practice pitch contouring, cadence modulation, and timbre brightness, receiving instantaneous, soothing visual reinforcement.
 2.  **Alternative Communication for Neurodivergent Children**: For non-verbal or autistic individuals, the app serves as a low-cognitive-load **sensory emotion board**, translating vocal frequency and resonance into comforting tactile textures and color fields, aiding expression without text pressure.
 3.  **Stress-Free Prosody Guides in Language Learning**: ESL and bilingual students can visually compare their stress, rhythm, and intonation against target voice prints, matching visual profiles to master pronunciation in a gamified, stress-free setting.
@@ -48,7 +48,7 @@ graph TD
     
     H -->|Verifies| H1[Strict TypeScript Compiling & Responsive Testing]
     
-    E1 & E2 & F1 & F2 & G1 & G2 & H1 -->|Assembled in| I[color my voice PWA Application]
+    E1 & E2 & F1 & F2 & G1 & G2 & H1 -->|Assembled in| I[Color My Voice PWA Application]
 ```
 
 ### How the Agents Worked Together:

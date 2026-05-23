@@ -6,7 +6,7 @@ type Translations = typeof translations.en;
 
 const translations = {
   en: {
-    appTitle: 'color my voice',
+    appTitle: 'Color My Voice',
     appSubtitle: 'voice synesthesia visualizer',
     consentTitle: 'Scientific Synesthesia Project',
     consentIntro: 'Color My Voice transforms your voice into beautiful, living colors while helping neuroscientists study the connections between vocal prosody, accents, and cross-modal perception.',
@@ -44,7 +44,7 @@ const translations = {
     age65plus: '65 years or older',
   },
   es: {
-    appTitle: 'color my voice',
+    appTitle: 'Color My Voice',
     appSubtitle: 'visualizador de sinestesia vocal',
     consentTitle: 'Proyecto Científico de Sinestesia',
     consentIntro: 'Color My Voice transforma tu voz en hermosos colores vivos mientras ayuda a los neurocientíficos a estudiar las conexiones entre la prosodia vocal, los acentos y la percepción cross-modal.',
