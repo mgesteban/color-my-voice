@@ -175,6 +175,7 @@ function AppContent() {
   };
 
   // 4. Download card snapshot (generates a high-resolution poster-sized frameable art print)
+  // 4. Download card snapshot (generates a high-resolution poster-sized frameable art print)
   const handleDownloadCard = () => {
     if (!sessionSummary) return;
 
@@ -189,35 +190,72 @@ function AppContent() {
       const ctx = posterCanvas.getContext('2d');
       if (!ctx) return;
 
-      // 2. Render deep black backdrop with soft radial glow
+      // 2. Resolve active synesthetic profile and details
+      const activeProfile = getSynestheticProfile(sessionSummary);
+      const prof = ALL_SYNESTHETIC_PROFILES.find(p => p.id === activeProfile.id) || activeProfile;
+      const icon = (prof as any).icon || '🔮';
+
+      // 3. Map dynamic profile theme colors for premium brand cohesion
+      let profileColor = '#38bdf8'; // Default cyan (crisp)
+      switch (activeProfile.id) {
+        case 'fluid':
+          profileColor = '#ec4899'; // Vibrant Rose Pink
+          break;
+        case 'viscous':
+          profileColor = '#fbbf24'; // Warm Amber Gold
+          break;
+        case 'crisp':
+          profileColor = '#22d3ee'; // Crystal Cyan/Teal
+          break;
+        case 'spiky':
+          profileColor = '#ef4444'; // Volcanic Lava Red
+          break;
+        case 'airy':
+          profileColor = '#34d399'; // Eucalyptus Mint Mint
+          break;
+      }
+
+      // 4. Render deep black backdrop with soft radial glow of active theme
       ctx.fillStyle = '#050608';
       ctx.fillRect(0, 0, 1200, 1800);
 
-      const radial = ctx.createRadialGradient(600, 480, 50, 600, 480, 700);
-      radial.addColorStop(0, 'rgba(56, 189, 248, 0.08)');
+      const radial = ctx.createRadialGradient(600, 520, 50, 600, 520, 750);
+      radial.addColorStop(0, `${profileColor}14`); // 8% opacity radial glow matching active profile
       radial.addColorStop(1, 'rgba(0, 0, 0, 0)');
       ctx.fillStyle = radial;
       ctx.fillRect(0, 0, 1200, 1800);
 
-      // 3. Render Title & Voice Signature Header
+      // 5. Draw double outer border frames to give a professional "gallery frame" layout
+      // Fine outer border
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(40, 40, 1120, 1720);
+
+      // Fine inner accent border
+      ctx.strokeStyle = `${profileColor}15`; // 8% opacity inner accent
+      ctx.lineWidth = 1;
+      ctx.strokeRect(48, 48, 1104, 1704);
+
+      // 6. Render Title & Voice Signature Header (Sophisticated, spaced typography)
       ctx.fillStyle = '#ffffff';
-      ctx.font = 'bold 54px Arial, sans-serif';
+      ctx.font = 'bold 54px "Outfit", sans-serif';
       ctx.textAlign = 'center';
-      ctx.fillText('color my voice', 600, 95);
+      ctx.textBaseline = 'top';
+      ctx.fillText('color my voice', 600, 85);
 
-      ctx.fillStyle = '#38bdf8';
-      ctx.font = 'bold 24px Arial, sans-serif';
-      ctx.fillText(`YOUR VOICE SIGNATURE #${sessionSummary.visualSignatureHash}`, 600, 142);
+      ctx.fillStyle = profileColor;
+      ctx.font = '700 16px "Plus Jakarta Sans", sans-serif';
+      ctx.fillText(`A CHROMACOUSTIC PORTRAIT   •   SIGNATURE #${sessionSummary.visualSignatureHash}`, 600, 150);
 
-      // 4. Crop and Draw the beautiful synesthetic paint visualizer in the center-top
+      // 7. Crop and Draw the beautiful synesthetic paint visualizer in the center-top
       ctx.save();
       const artX = 150;
-      const artY = 200;
+      const artY = 205;
       const artW = 900;
-      const artH = 640;
-      const artRadius = 24;
+      const artH = 600;
+      const artRadius = 20;
 
-      // Round rectangle clip path
+      // Round rectangle clip path for custom framed artwork
       ctx.beginPath();
       ctx.moveTo(artX + artRadius, artY);
       ctx.lineTo(artX + artW - artRadius, artY);
@@ -234,15 +272,26 @@ function AppContent() {
       ctx.drawImage(liveCanvas, artX, artY, artW, artH);
       ctx.restore();
 
-      // Soft borders around the cropped visualizer artwork
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
-      ctx.lineWidth = 2;
-      ctx.strokeRect(artX, artY, artW, artH);
+      // Dual border framing details around the visualizer artwork
+      ctx.strokeStyle = `${profileColor}28`; // 16% opacity theme highlight
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(artX + artRadius, artY);
+      ctx.lineTo(artX + artW - artRadius, artY);
+      ctx.quadraticCurveTo(artX + artW, artY, artX + artW, artY + artRadius);
+      ctx.lineTo(artX + artW, artY + artH - artRadius);
+      ctx.quadraticCurveTo(artX + artW, artY + artH, artX + artW - artRadius, artY + artH);
+      ctx.lineTo(artX + artRadius, artY + artH);
+      ctx.quadraticCurveTo(artX, artY + artH, artX, artY + artH - artRadius);
+      ctx.lineTo(artX, artY + artRadius);
+      ctx.quadraticCurveTo(artX, artY, artX + artRadius, artY);
+      ctx.closePath();
+      ctx.stroke();
 
-      // 5. Draw 4 Acoustic Statistics Grid Blocks
-      const statY = 880;
+      // 8. Draw 4 Acoustic Statistics Grid Cards
+      const statY = 845;
       const boxW = 210;
-      const boxH = 125;
+      const boxH = 100;
       const gap = 20;
       const startX = 600 - (boxW * 4 + gap * 3) / 2;
 
@@ -275,25 +324,26 @@ function AppContent() {
         ctx.fill();
         ctx.stroke();
 
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.45)';
-        ctx.font = 'bold 13px Arial, sans-serif';
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+        ctx.font = '700 11px "Plus Jakarta Sans", sans-serif';
         ctx.textAlign = 'center';
-        ctx.fillText(s.label, bx + boxW / 2, statY + 40);
+        ctx.fillText(s.label, bx + boxW / 2, statY + 30);
 
         ctx.fillStyle = '#ffffff';
-        ctx.font = 'bold 28px Arial, sans-serif';
-        ctx.fillText(s.val, bx + boxW / 2, statY + 85);
+        ctx.font = 'bold 24px "Outfit", sans-serif';
+        ctx.fillText(s.val, bx + boxW / 2, statY + 68);
       });
 
-      // 6. Draw Large Synesthetic Profile Interpretation Panel at the bottom
-      const panelY = 1045;
+      // 9. Draw Premium Dedicated Exhibition Placard (Replacing comparative list)
+      const panelY = 975;
       const panelW = 900;
-      const panelH = 620;
+      const panelH = 630;
       const px = 150;
-      const pr = 20;
+      const pr = 24;
 
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.03)';
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
+      // Card Obsidian Glass body
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.015)';
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
       ctx.lineWidth = 1.5;
 
       ctx.beginPath();
@@ -310,121 +360,101 @@ function AppContent() {
       ctx.fill();
       ctx.stroke();
 
-      ctx.fillStyle = '#ffffff';
-      ctx.font = 'bold 26px Arial, sans-serif';
-      ctx.textAlign = 'left';
-      ctx.fillText('🔮 Synesthetic Profile Map', px + 40, panelY + 50);
+      // Soft active theme glowing line accent inside the placard
+      ctx.strokeStyle = `${profileColor}20`; // 12% opacity glow
+      ctx.lineWidth = 1;
+      ctx.strokeRect(px + 4, panelY + 4, panelW - 8, panelH - 8);
 
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.06)';
+      // A. Center Placard Header Title
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.35)';
+      ctx.font = '700 12px "Plus Jakarta Sans", sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('SENSORY SYNESTHESIA TRANSLATION', 600, panelY + 40);
+
+      // B. Large center-piece Emoji Icon
+      ctx.font = '72px Arial';
+      ctx.fillText(icon, 600, panelY + 125);
+
+      // C. TACTILE TEXTURE Section
+      ctx.fillStyle = profileColor;
+      ctx.font = '700 11px "Plus Jakarta Sans", sans-serif';
+      ctx.fillText('TACTILE TEXTURE & SURFACE', 600, panelY + 195);
+
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 36px "Outfit", sans-serif';
+      ctx.fillText(prof.texture, 600, panelY + 240);
+
+      // Fine elegant separator line
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
+      ctx.lineWidth = 1;
+      ctx.setLineDash([4, 6]);
+      ctx.beginPath();
+      ctx.moveTo(px + 100, panelY + 285);
+      ctx.lineTo(px + panelW - 100, panelY + 285);
+      ctx.stroke();
+      ctx.setLineDash([]); // Reset dash state
+
+      // D. LEXICAL-GUSTATORY TASTE Section
+      ctx.fillStyle = '#fbbf24'; // Gold label
+      ctx.font = '700 11px "Plus Jakarta Sans", sans-serif';
+      ctx.fillText('LEXICAL-GUSTATORY FLAVOR PROFILE', 600, panelY + 325);
+
+      // Wrapped Taste Text Engine
+      const wrapText = (
+        context: CanvasRenderingContext2D,
+        text: string,
+        x: number,
+        y: number,
+        maxWidth: number,
+        lineHeight: number
+      ): number => {
+        const words = text.split(' ');
+        let line = '';
+        let currentY = y;
+        let linesCount = 0;
+
+        for (let n = 0; n < words.length; n++) {
+          const testLine = line + words[n] + ' ';
+          const metrics = context.measureText(testLine);
+          const testWidth = metrics.width;
+          if (testWidth > maxWidth && n > 0) {
+            context.fillText(line.trim(), x, currentY);
+            line = words[n] + ' ';
+            currentY += lineHeight;
+            linesCount++;
+          } else {
+            line = testLine;
+          }
+        }
+        context.fillText(line.trim(), x, currentY);
+        linesCount++;
+        return linesCount * lineHeight;
+      };
+
+      ctx.fillStyle = '#fef08a'; // Sweet light yellow contrast text
+      ctx.font = 'bold 22px "Outfit", sans-serif';
+      const tasteY = panelY + 365;
+      const tasteHeight = wrapText(ctx, prof.taste, 600, tasteY, 780, 32);
+
+      // E. MOUTHFEEL Subtext (Positioned dynamically below taste text)
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+      ctx.font = 'italic 18px "Plus Jakarta Sans", sans-serif';
+      ctx.fillText(`Feels ${prof.mouthfeel.toLowerCase()}`, 600, tasteY + tasteHeight + 20);
+
+      // 10. Draw soft exhibition poster footer watermark
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
       ctx.lineWidth = 1;
       ctx.beginPath();
-      ctx.moveTo(px + 40, panelY + 75);
-      ctx.lineTo(px + panelW - 40, panelY + 75);
+      ctx.moveTo(150, 1680);
+      ctx.lineTo(1050, 1680);
       ctx.stroke();
 
-      const activeProfile = getSynestheticProfile(sessionSummary);
-
-      ALL_SYNESTHETIC_PROFILES.forEach((prof, idx) => {
-        const isActive = prof.id === activeProfile.id;
-        const itemY = panelY + 105 + idx * 75;
-
-        if (isActive) {
-          ctx.fillStyle = 'rgba(56, 189, 248, 0.05)';
-          ctx.strokeStyle = '#38bdf8';
-          ctx.lineWidth = 1.5;
-
-          const ir = 10;
-          const ix = px + 40;
-          const iw = panelW - 80;
-          const ih = 175; // taller active height
-
-          ctx.beginPath();
-          ctx.moveTo(ix + ir, itemY);
-          ctx.lineTo(ix + iw - ir, itemY);
-          ctx.quadraticCurveTo(ix + iw, itemY, ix + iw, itemY + ir);
-          ctx.lineTo(ix + iw, itemY + ih - ir);
-          ctx.quadraticCurveTo(ix + iw, itemY + ih, ix + iw - ir, itemY + ih);
-          ctx.lineTo(ix + ir, itemY + ih);
-          ctx.quadraticCurveTo(ix, itemY + ih, ix, itemY + ih - ir);
-          ctx.lineTo(ix, itemY + ir);
-          ctx.quadraticCurveTo(ix, itemY, ix + ir, itemY);
-          ctx.closePath();
-          ctx.fill();
-          ctx.stroke();
-
-          ctx.fillStyle = '#38bdf8';
-          ctx.font = 'bold 12px Arial, sans-serif';
-          ctx.textAlign = 'right';
-          ctx.fillText('✨ ACTIVE SIGNATURE', ix + iw - 20, itemY + 32);
-
-          ctx.textAlign = 'left';
-          ctx.font = 'bold 36px Arial, sans-serif';
-          ctx.fillText(prof.icon, ix + 25, itemY + 50);
-
-          ctx.fillStyle = '#38bdf8';
-          ctx.font = 'bold 20px Arial, sans-serif';
-          ctx.fillText(prof.texture, ix + 85, itemY + 38);
-
-          ctx.fillStyle = 'rgba(255, 255, 255, 0.45)';
-          ctx.font = 'bold 11px Arial, sans-serif';
-          ctx.fillText('TACTILE TEXTURE & SURFACE', ix + 85, itemY + 18);
-
-          ctx.fillStyle = 'rgba(255, 255, 255, 0.45)';
-          ctx.font = 'bold 11px Arial, sans-serif';
-          ctx.fillText('LEXICAL-GUSTATORY FLAVOR PROFILE', ix + 25, itemY + 98);
-
-          ctx.fillStyle = '#fcd34d';
-          ctx.font = 'bold 16px Arial, sans-serif';
-          ctx.fillText(prof.taste, ix + 25, itemY + 120);
-
-          ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
-          ctx.font = 'italic 14px Arial, sans-serif';
-          ctx.fillText(`Feels ${prof.mouthfeel.toLowerCase()}`, ix + 25, itemY + 145);
-        } else {
-          const ix = px + 40;
-          const iw = panelW - 80;
-          const ih = 50;
-
-          // Push elements down below the tall active item
-          const activeIdx = ALL_SYNESTHETIC_PROFILES.findIndex(p => p.id === activeProfile.id);
-          const adjustedY = itemY + (idx > activeIdx ? 100 : 0);
-
-          ctx.fillStyle = 'rgba(255, 255, 255, 0.01)';
-          ctx.strokeStyle = 'rgba(255, 255, 255, 0.02)';
-          ctx.lineWidth = 1;
-
-          const ir = 8;
-          ctx.beginPath();
-          ctx.moveTo(ix + ir, adjustedY);
-          ctx.lineTo(ix + iw - ir, adjustedY);
-          ctx.quadraticCurveTo(ix + iw, adjustedY, ix + iw, adjustedY + ir);
-          ctx.lineTo(ix + iw, adjustedY + ih - ir);
-          ctx.quadraticCurveTo(ix + iw, adjustedY + ih, ix + iw - ir, adjustedY + ih);
-          ctx.lineTo(ix + ir, adjustedY + ih);
-          ctx.quadraticCurveTo(ix, adjustedY + ih, ix, adjustedY + ih - ir);
-          ctx.lineTo(ix, adjustedY + ir);
-          ctx.quadraticCurveTo(ix, adjustedY, ix + ir, adjustedY);
-          ctx.closePath();
-          ctx.fill();
-          ctx.stroke();
-
-          ctx.textAlign = 'left';
-          ctx.fillStyle = 'rgba(255, 255, 255, 0.35)';
-          ctx.font = '22px Arial, sans-serif';
-          ctx.fillText(prof.icon, ix + 20, adjustedY + 34);
-
-          ctx.font = 'bold 15px Arial, sans-serif';
-          ctx.fillText(prof.texture, ix + 60, adjustedY + 31);
-        }
-      });
-
-      // 7. Render soft exhibition poster footer watermark
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
-      ctx.font = 'bold 13px Arial, sans-serif';
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.25)';
+      ctx.font = '700 12px "Plus Jakarta Sans", sans-serif';
       ctx.textAlign = 'center';
-      ctx.fillText('COLOR MY VOICE   |   GOOGLE I/O DEEPMIND HACKATHON 2026', 600, 1725);
+      ctx.fillText('COLOR MY VOICE   •   CREATOR ENGINE BY GEMINI 3.5 FLASH   •   GOOGLE I/O HACKATHON 2026', 600, 1720);
 
-      // 8. Stream high-DPI poster image download link
+      // 11. Stream high-DPI poster image download link
       const dataUrl = posterCanvas.toDataURL('image/png');
       const link = document.createElement('a');
       link.download = `color-my-voice-poster-${sessionSummary.visualSignatureHash}.png`;
