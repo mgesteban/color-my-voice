@@ -174,21 +174,264 @@ function AppContent() {
     }
   };
 
-  // 4. Download card snapshot
+  // 4. Download card snapshot (generates a high-resolution poster-sized frameable art print)
   const handleDownloadCard = () => {
     if (!sessionSummary) return;
 
-    const canvas = document.querySelector('canvas');
-    if (canvas) {
-      try {
-        const dataUrl = canvas.toDataURL('image/png');
-        const link = document.createElement('a');
-        link.download = `chromacoustic-voice-signature-${sessionSummary.visualSignatureHash}.png`;
-        link.href = dataUrl;
-        link.click();
-      } catch (e) {
-        console.error('Failed to capture signature image:', e);
-      }
+    const liveCanvas = document.querySelector('canvas');
+    if (!liveCanvas) return;
+
+    try {
+      // 1. Initialize off-screen poster canvas with poster dimensions (1200 x 1800 px, 2:3 portrait)
+      const posterCanvas = document.createElement('canvas');
+      posterCanvas.width = 1200;
+      posterCanvas.height = 1800;
+      const ctx = posterCanvas.getContext('2d');
+      if (!ctx) return;
+
+      // 2. Render deep black backdrop with soft radial glow
+      ctx.fillStyle = '#050608';
+      ctx.fillRect(0, 0, 1200, 1800);
+
+      const radial = ctx.createRadialGradient(600, 480, 50, 600, 480, 700);
+      radial.addColorStop(0, 'rgba(56, 189, 248, 0.08)');
+      radial.addColorStop(1, 'rgba(0, 0, 0, 0)');
+      ctx.fillStyle = radial;
+      ctx.fillRect(0, 0, 1200, 1800);
+
+      // 3. Render Title & Voice Signature Header
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 54px Arial, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('color my voice', 600, 95);
+
+      ctx.fillStyle = '#38bdf8';
+      ctx.font = 'bold 24px Arial, sans-serif';
+      ctx.fillText(`YOUR VOICE SIGNATURE #${sessionSummary.visualSignatureHash}`, 600, 142);
+
+      // 4. Crop and Draw the beautiful synesthetic paint visualizer in the center-top
+      ctx.save();
+      const artX = 150;
+      const artY = 200;
+      const artW = 900;
+      const artH = 640;
+      const artRadius = 24;
+
+      // Round rectangle clip path
+      ctx.beginPath();
+      ctx.moveTo(artX + artRadius, artY);
+      ctx.lineTo(artX + artW - artRadius, artY);
+      ctx.quadraticCurveTo(artX + artW, artY, artX + artW, artY + artRadius);
+      ctx.lineTo(artX + artW, artY + artH - artRadius);
+      ctx.quadraticCurveTo(artX + artW, artY + artH, artX + artW - artRadius, artY + artH);
+      ctx.lineTo(artX + artRadius, artY + artH);
+      ctx.quadraticCurveTo(artX, artY + artH, artX, artY + artH - artRadius);
+      ctx.lineTo(artX, artY + artRadius);
+      ctx.quadraticCurveTo(artX, artY, artX + artRadius, artY);
+      ctx.closePath();
+      ctx.clip();
+
+      ctx.drawImage(liveCanvas, artX, artY, artW, artH);
+      ctx.restore();
+
+      // Soft borders around the cropped visualizer artwork
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(artX, artY, artW, artH);
+
+      // 5. Draw 4 Acoustic Statistics Grid Blocks
+      const statY = 880;
+      const boxW = 210;
+      const boxH = 125;
+      const gap = 20;
+      const startX = 600 - (boxW * 4 + gap * 3) / 2;
+
+      const stats = [
+        { label: 'PITCH (MEAN F0)', val: `${sessionSummary.f0.mean.toFixed(0)} Hz` },
+        { label: 'TIMBRE CENTROID', val: `${(sessionSummary.timbre.centroidMean * 100).toFixed(0)}%` },
+        { label: 'CADENCE SPEED', val: `${sessionSummary.cadence.syllableRateEstimate.toFixed(1)} /s` },
+        { label: 'PAUSE RATIO', val: `${(sessionSummary.cadence.pauseRatio * 100).toFixed(0)}%` }
+      ];
+
+      stats.forEach((s, i) => {
+        const bx = startX + i * (boxW + gap);
+        const br = 12;
+
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.02)';
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.06)';
+        ctx.lineWidth = 1;
+
+        ctx.beginPath();
+        ctx.moveTo(bx + br, statY);
+        ctx.lineTo(bx + boxW - br, statY);
+        ctx.quadraticCurveTo(bx + boxW, statY, bx + boxW, statY + br);
+        ctx.lineTo(bx + boxW, statY + boxH - br);
+        ctx.quadraticCurveTo(bx + boxW, statY + boxH, bx + boxW - br, statY + boxH);
+        ctx.lineTo(bx + br, statY + boxH);
+        ctx.quadraticCurveTo(bx, statY + boxH, bx, statY + boxH - br);
+        ctx.lineTo(bx, statY + br);
+        ctx.quadraticCurveTo(bx, statY, bx + br, statY);
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.45)';
+        ctx.font = 'bold 13px Arial, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(s.label, bx + boxW / 2, statY + 40);
+
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 28px Arial, sans-serif';
+        ctx.fillText(s.val, bx + boxW / 2, statY + 85);
+      });
+
+      // 6. Draw Large Synesthetic Profile Interpretation Panel at the bottom
+      const panelY = 1045;
+      const panelW = 900;
+      const panelH = 620;
+      const px = 150;
+      const pr = 20;
+
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.03)';
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
+      ctx.lineWidth = 1.5;
+
+      ctx.beginPath();
+      ctx.moveTo(px + pr, panelY);
+      ctx.lineTo(px + panelW - pr, panelY);
+      ctx.quadraticCurveTo(px + panelW, panelY, px + panelW, panelY + pr);
+      ctx.lineTo(px + panelW, panelY + panelH - pr);
+      ctx.quadraticCurveTo(px + panelW, panelY + panelH, px + panelW - pr, panelY + panelH);
+      ctx.lineTo(px + pr, panelY + panelH);
+      ctx.quadraticCurveTo(px, panelY + panelH, px, panelY + panelH - pr);
+      ctx.lineTo(px, panelY + pr);
+      ctx.quadraticCurveTo(px, panelY, px + pr, panelY);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 26px Arial, sans-serif';
+      ctx.textAlign = 'left';
+      ctx.fillText('🔮 Synesthetic Profile Map', px + 40, panelY + 50);
+
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.06)';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(px + 40, panelY + 75);
+      ctx.lineTo(px + panelW - 40, panelY + 75);
+      ctx.stroke();
+
+      const activeProfile = getSynestheticProfile(sessionSummary);
+
+      ALL_SYNESTHETIC_PROFILES.forEach((prof, idx) => {
+        const isActive = prof.id === activeProfile.id;
+        const itemY = panelY + 105 + idx * 75;
+
+        if (isActive) {
+          ctx.fillStyle = 'rgba(56, 189, 248, 0.05)';
+          ctx.strokeStyle = '#38bdf8';
+          ctx.lineWidth = 1.5;
+
+          const ir = 10;
+          const ix = px + 40;
+          const iw = panelW - 80;
+          const ih = 175; // taller active height
+
+          ctx.beginPath();
+          ctx.moveTo(ix + ir, itemY);
+          ctx.lineTo(ix + iw - ir, itemY);
+          ctx.quadraticCurveTo(ix + iw, itemY, ix + iw, itemY + ir);
+          ctx.lineTo(ix + iw, itemY + ih - ir);
+          ctx.quadraticCurveTo(ix + iw, itemY + ih, ix + iw - ir, itemY + ih);
+          ctx.lineTo(ix + ir, itemY + ih);
+          ctx.quadraticCurveTo(ix, itemY + ih, ix, itemY + ih - ir);
+          ctx.lineTo(ix, itemY + ir);
+          ctx.quadraticCurveTo(ix, itemY, ix + ir, itemY);
+          ctx.closePath();
+          ctx.fill();
+          ctx.stroke();
+
+          ctx.fillStyle = '#38bdf8';
+          ctx.font = 'bold 12px Arial, sans-serif';
+          ctx.textAlign = 'right';
+          ctx.fillText('✨ ACTIVE SIGNATURE', ix + iw - 20, itemY + 32);
+
+          ctx.textAlign = 'left';
+          ctx.font = 'bold 36px Arial, sans-serif';
+          ctx.fillText(prof.icon, ix + 25, itemY + 50);
+
+          ctx.fillStyle = '#38bdf8';
+          ctx.font = 'bold 20px Arial, sans-serif';
+          ctx.fillText(prof.texture, ix + 85, itemY + 38);
+
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.45)';
+          ctx.font = 'bold 11px Arial, sans-serif';
+          ctx.fillText('TACTILE TEXTURE & SURFACE', ix + 85, itemY + 18);
+
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.45)';
+          ctx.font = 'bold 11px Arial, sans-serif';
+          ctx.fillText('LEXICAL-GUSTATORY FLAVOR PROFILE', ix + 25, itemY + 98);
+
+          ctx.fillStyle = '#fcd34d';
+          ctx.font = 'bold 16px Arial, sans-serif';
+          ctx.fillText(prof.taste, ix + 25, itemY + 120);
+
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+          ctx.font = 'italic 14px Arial, sans-serif';
+          ctx.fillText(`Feels ${prof.mouthfeel.toLowerCase()}`, ix + 25, itemY + 145);
+        } else {
+          const ix = px + 40;
+          const iw = panelW - 80;
+          const ih = 50;
+
+          // Push elements down below the tall active item
+          const activeIdx = ALL_SYNESTHETIC_PROFILES.findIndex(p => p.id === activeProfile.id);
+          const adjustedY = itemY + (idx > activeIdx ? 100 : 0);
+
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.01)';
+          ctx.strokeStyle = 'rgba(255, 255, 255, 0.02)';
+          ctx.lineWidth = 1;
+
+          const ir = 8;
+          ctx.beginPath();
+          ctx.moveTo(ix + ir, adjustedY);
+          ctx.lineTo(ix + iw - ir, adjustedY);
+          ctx.quadraticCurveTo(ix + iw, adjustedY, ix + iw, adjustedY + ir);
+          ctx.lineTo(ix + iw, adjustedY + ih - ir);
+          ctx.quadraticCurveTo(ix + iw, adjustedY + ih, ix + iw - ir, adjustedY + ih);
+          ctx.lineTo(ix + ir, adjustedY + ih);
+          ctx.quadraticCurveTo(ix, adjustedY + ih, ix, adjustedY + ih - ir);
+          ctx.lineTo(ix, adjustedY + ir);
+          ctx.quadraticCurveTo(ix, adjustedY, ix + ir, adjustedY);
+          ctx.closePath();
+          ctx.fill();
+          ctx.stroke();
+
+          ctx.textAlign = 'left';
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.35)';
+          ctx.font = '22px Arial, sans-serif';
+          ctx.fillText(prof.icon, ix + 20, adjustedY + 34);
+
+          ctx.font = 'bold 15px Arial, sans-serif';
+          ctx.fillText(prof.texture, ix + 60, adjustedY + 31);
+        }
+      });
+
+      // 7. Render soft exhibition poster footer watermark
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
+      ctx.font = 'bold 13px Arial, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('COLOR MY VOICE   |   GOOGLE I/O DEEPMIND HACKATHON 2026', 600, 1725);
+
+      // 8. Stream high-DPI poster image download link
+      const dataUrl = posterCanvas.toDataURL('image/png');
+      const link = document.createElement('a');
+      link.download = `color-my-voice-poster-${sessionSummary.visualSignatureHash}.png`;
+      link.href = dataUrl;
+      link.click();
+    } catch (e) {
+      console.error('Failed to capture high-resolution poster print:', e);
     }
   };
 
