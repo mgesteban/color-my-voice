@@ -29,4 +29,8 @@ dist-ssr
 # Test voice signatures
 chromacoustic-voice-signature-*.png
 
+# Exported spreadsheets
+*.csv
+
+
 

@@ -120,13 +120,13 @@ export function mapFrameToVisualToken(
   let patternId = 'fluid'; // velvet
   const safeFlatness = isNaN(frame.spectralFlatness) || !isFinite(frame.spectralFlatness) ? 0.0 : frame.spectralFlatness;
 
-  if (safeCentroid > 0.40 && (safeJitter > 0.015 || safeFlatness > 0.35)) {
-    patternId = 'spiky';     // sandpaper
-  } else if (safeRms < 0.03 && safeFlatness > 0.35) {
+  if (safeRms < 0.035 && safeFlatness > 0.45) {
     patternId = 'airy';      // airy cloud
-  } else if (safeRms > 0.05 && (f0Hz !== null && f0Hz < 150) && safeJitter < 0.02) {
+  } else if (safeCentroid > 0.55 && safeJitter > 0.06) {
+    patternId = 'spiky';     // sandpaper
+  } else if (f0Hz !== null && f0Hz > 0 && f0Hz < 145 && safeCentroid < 0.38) {
     patternId = 'viscous';   // maple syrup
-  } else if (safeCentroid > 0.35 && safeFlatness < 0.25) {
+  } else if (f0Hz !== null && f0Hz >= 145 && safeCentroid >= 0.38) {
     patternId = 'crisp';     // brittle glass
   }
 
@@ -153,27 +153,44 @@ export function getSynestheticProfile(summary: any): SynestheticProfile {
   const flatness = summary?.timbre?.flatnessMean || 0;
   const jitter = summary?.voiceQuality?.jitterMean || 0;
 
-  let texture = "Warm liquid velvet";
-  let taste = "Warm buttered crusty bread soaked in rich tomato soup";
-  let mouthfeel = "Creamy, comforting, and highly viscous";
-
-  if (centroid > 0.40 && (jitter > 0.015 || flatness > 0.35)) {
-    texture = "Coarse volcanic sandpaper";
-    taste = "Crisp seasoned pizza combined with tangy cheese Doritos";
-    mouthfeel = "Crunchy, salty, and sharp";
-  } else if (rms < 0.03 && flatness > 0.35) {
-    texture = "Light airy morning mist";
-    taste = "Sweet peach iced tea combined with fresh eucalyptus mint";
-    mouthfeel = "Cooling, sweet, and refreshing";
-  } else if (rms > 0.05 && f0 < 150 && jitter < 0.02) {
-    texture = "Thick golden maple syrup";
-    taste = "Earthy pinto beans with ground cumin and dry desert dust";
-    mouthfeel = "Powdery, dry, and highly savory";
-  } else if (centroid > 0.35 && flatness < 0.25) {
-    texture = "Brittle crystalline glass";
-    taste = "Tangy tomato slices on thin salted butter crackers";
-    mouthfeel = "Crisp, clean, and mildly tart";
+  // 1. Extreme Secondary Modifiers: Whispers and Screams/Extremely Harsh Speech
+  if (rms < 0.035 && flatness > 0.45) {
+    return {
+      texture: "Light airy morning mist",
+      taste: "Sweet peach iced tea combined with fresh eucalyptus mint",
+      mouthfeel: "Cooling, sweet, and refreshing"
+    };
+  }
+  
+  if (centroid > 0.55 && jitter > 0.06) {
+    return {
+      texture: "Coarse volcanic sandpaper",
+      taste: "Crisp seasoned pizza combined with tangy cheese Doritos",
+      mouthfeel: "Crunchy, salty, and sharp"
+    };
   }
 
-  return { texture, taste, mouthfeel };
+  // 2. Primary Vocal Dimorphism: Deep Male (Maple Syrup) vs. Bright Female (Crystalline Glass)
+  if (f0 > 0 && f0 < 145 && centroid < 0.38) {
+    return {
+      texture: "Thick golden maple syrup",
+      taste: "Earthy pinto beans with ground cumin and dry desert dust",
+      mouthfeel: "Powdery, dry, and highly savory"
+    };
+  }
+  
+  if (f0 >= 145 && centroid >= 0.38) {
+    return {
+      texture: "Brittle crystalline glass",
+      taste: "Tangy tomato slices on thin salted butter crackers",
+      mouthfeel: "Crisp, clean, and mildly tart"
+    };
+  }
+
+  // 3. Default Balanced Voice Profile
+  return {
+    texture: "Warm liquid velvet",
+    taste: "Warm buttered crusty bread soaked in rich tomato soup",
+    mouthfeel: "Creamy, comforting, and highly viscous"
+  };
 }
