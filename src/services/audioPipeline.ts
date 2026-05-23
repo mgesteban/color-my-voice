@@ -58,6 +58,8 @@ export class AudioPipeline {
       // 4. Setup Meyda Analyzer
       // We run Meyda on the AnalyserNode output manually in our loop to synchronize F0 and spectral data perfectly.
       Meyda.audioContext = this.audioCtx;
+      Meyda.bufferSize = this.analyser.fftSize;
+      Meyda.sampleRate = this.audioCtx.sampleRate;
 
       this.isRecording = true;
       this.frames = [];
@@ -100,9 +102,10 @@ export class AudioPipeline {
           const rawRms = isNaN(features.rms) || !isFinite(features.rms) ? 0.0 : features.rms;
           const rawZcr = isNaN(features.zcr) || !isFinite(features.zcr) ? 0.0 : features.zcr;
 
-          // Normalize centroid (convert bin index to Hz and scale to human vocal range)
-          const binFreqResolution = sampleRate / this.analyser.fftSize;
-          const centroidHz = rawCentroid * binFreqResolution;
+          // Normalize centroid (handle both bin index and Hz dynamically)
+          const centroidHz = rawCentroid < 512 
+            ? rawCentroid * (sampleRate / this.analyser.fftSize) 
+            : rawCentroid;
           // Map 300Hz..3000Hz to 0.0..1.0
           const normalizedCentroid = Math.max(0.0, Math.min(1.0, (centroidHz - 300) / (3000 - 300)));
 
