@@ -4,7 +4,7 @@ import { ConsentGate } from './components/ConsentGate';
 import { ResearchForm } from './components/ResearchForm';
 import { CanvasVisualizer } from './components/CanvasVisualizer';
 import { AudioPipeline } from './services/audioPipeline';
-import { mapFrameToVisualToken, getSynestheticProfile } from './services/crossModalMapper';
+import { mapFrameToVisualToken, getSynestheticProfile, ALL_SYNESTHETIC_PROFILES } from './services/crossModalMapper';
 import type { VisualToken, ResearchRecord, SelfReportedMeta } from './types/chromacoustic';
 import { ResearchApi } from './services/ResearchApi';
 
@@ -330,51 +330,115 @@ function AppContent() {
 
           {/* Synesthetic Texture & Taste Translation Panel */}
           {(() => {
-            const profile = getSynestheticProfile(sessionSummary);
+            const activeProfile = getSynestheticProfile(sessionSummary);
             return (
               <div style={{
-                background: 'rgba(255, 255, 255, 0.04)',
-                border: '1px solid rgba(255, 255, 255, 0.08)',
-                borderRadius: '16px',
-                padding: '1.2rem',
-                margin: '1.2rem 0',
+                background: 'rgba(255, 255, 255, 0.03)',
+                border: '1px solid rgba(255, 255, 255, 0.06)',
+                borderRadius: '20px',
+                padding: '1.25rem',
+                margin: '1.25rem 0',
                 textAlign: 'left',
-                backdropFilter: 'blur(8px)',
-                WebkitBackdropFilter: 'blur(8px)',
+                backdropFilter: 'blur(10px)',
+                WebkitBackdropFilter: 'blur(10px)',
               }}>
                 <h3 style={{
-                  fontSize: '0.95rem',
+                  fontSize: '1rem',
                   fontWeight: 700,
                   color: '#ffffff',
-                  marginBottom: '0.8rem',
+                  marginBottom: '1rem',
                   display: 'flex',
                   alignItems: 'center',
                   gap: '0.5rem',
-                  borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
-                  paddingBottom: '0.4rem',
+                  borderBottom: '1px solid rgba(255, 255, 255, 0.06)',
+                  paddingBottom: '0.5rem',
                 }}>
-                  ✨ Synesthetic Translation
+                  🔮 Synesthetic Profile Map
                 </h3>
-                
-                <div style={{ marginBottom: '0.9rem' }}>
-                  <div style={{ fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'rgba(255, 255, 255, 0.5)', marginBottom: '0.15rem' }}>
-                    Tactile Texture & Surface
-                  </div>
-                  <div style={{ fontSize: '0.95rem', fontWeight: 600, color: 'var(--color-accent)' }}>
-                    {profile.texture}
-                  </div>
-                </div>
 
-                <div>
-                  <div style={{ fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'rgba(255, 255, 255, 0.5)', marginBottom: '0.15rem' }}>
-                    Lexical-Gustatory Taste & Mouthfeel
-                  </div>
-                  <div style={{ fontSize: '0.95rem', fontWeight: 600, color: '#fcd34d' }}>
-                    {profile.taste}
-                  </div>
-                  <div style={{ fontSize: '0.8rem', fontStyle: 'italic', color: 'rgba(255, 255, 255, 0.6)', marginTop: '0.2rem' }}>
-                    Feels {profile.mouthfeel.toLowerCase()}
-                  </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                  {ALL_SYNESTHETIC_PROFILES.map((prof) => {
+                    const isActive = prof.id === activeProfile.id;
+
+                    if (isActive) {
+                      return (
+                        <div
+                          key={prof.id}
+                          style={{
+                            background: 'rgba(255, 255, 255, 0.06)',
+                            border: '1.5px solid var(--color-accent)',
+                            borderRadius: '14px',
+                            padding: '1rem',
+                            boxShadow: '0 0 15px rgba(56, 189, 248, 0.15)',
+                            position: 'relative',
+                            transition: 'all 0.3s ease',
+                          }}
+                        >
+                          <span style={{
+                            position: 'absolute',
+                            top: '0.75rem',
+                            right: '0.75rem',
+                            background: 'rgba(56, 189, 248, 0.15)',
+                            color: 'var(--color-accent)',
+                            fontSize: '0.65rem',
+                            fontWeight: 700,
+                            padding: '0.2rem 0.5rem',
+                            borderRadius: '20px',
+                            textTransform: 'uppercase',
+                            letterSpacing: '0.05em',
+                          }}>
+                            ✨ Active Signature
+                          </span>
+
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '0.75rem' }}>
+                            <span style={{ fontSize: '1.5rem' }}>{prof.icon}</span>
+                            <div>
+                              <div style={{ fontSize: '0.65rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'rgba(255, 255, 255, 0.5)', marginBottom: '0.1rem' }}>
+                                Tactile Texture & Surface
+                              </div>
+                              <div style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--color-accent)' }}>
+                                {prof.texture}
+                              </div>
+                            </div>
+                          </div>
+
+                          <div style={{ borderTop: '1px dashed rgba(255, 255, 255, 0.08)', paddingTop: '0.65rem' }}>
+                            <div style={{ fontSize: '0.65rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'rgba(255, 255, 255, 0.5)', marginBottom: '0.15rem' }}>
+                              Lexical-Gustatory Taste & Mouthfeel
+                            </div>
+                            <div style={{ fontSize: '0.95rem', fontWeight: 600, color: '#fcd34d' }}>
+                              {prof.taste}
+                            </div>
+                            <div style={{ fontSize: '0.8rem', fontStyle: 'italic', color: 'rgba(255, 255, 255, 0.65)', marginTop: '0.2rem' }}>
+                              Feels {prof.mouthfeel.toLowerCase()}
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    } else {
+                      return (
+                        <div
+                          key={prof.id}
+                          style={{
+                            background: 'rgba(255, 255, 255, 0.01)',
+                            border: '1px solid rgba(255, 255, 255, 0.03)',
+                            borderRadius: '10px',
+                            padding: '0.6rem 0.8rem',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '0.6rem',
+                            opacity: 0.35,
+                            transition: 'all 0.3s ease',
+                          }}
+                        >
+                          <span style={{ fontSize: '1.2rem' }}>{prof.icon}</span>
+                          <span style={{ fontSize: '0.85rem', fontWeight: 500, color: '#ffffff' }}>
+                            {prof.texture}
+                          </span>
+                        </div>
+                      );
+                    }
+                  })}
                 </div>
               </div>
             );

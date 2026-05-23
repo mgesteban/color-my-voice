@@ -141,10 +141,55 @@ export function mapFrameToVisualToken(
 }
 
 export interface SynestheticProfile {
+  id: 'fluid' | 'viscous' | 'crisp' | 'spiky' | 'airy';
   texture: string;
   taste: string;
   mouthfeel: string;
 }
+
+export const ALL_SYNESTHETIC_PROFILES: {
+  id: 'fluid' | 'viscous' | 'crisp' | 'spiky' | 'airy';
+  texture: string;
+  taste: string;
+  mouthfeel: string;
+  icon: string;
+}[] = [
+  {
+    id: 'fluid',
+    texture: "Warm liquid velvet",
+    taste: "Warm buttered crusty bread soaked in rich tomato soup",
+    mouthfeel: "Creamy, comforting, and highly viscous",
+    icon: "🧶"
+  },
+  {
+    id: 'viscous',
+    texture: "Thick golden maple syrup",
+    taste: "Earthy pinto beans with ground cumin and dry desert dust",
+    mouthfeel: "Powdery, dry, and highly savory",
+    icon: "🍯"
+  },
+  {
+    id: 'crisp',
+    texture: "Brittle crystalline glass",
+    taste: "Tangy tomato slices on thin salted butter crackers",
+    mouthfeel: "Crisp, clean, and mildly tart",
+    icon: "💎"
+  },
+  {
+    id: 'spiky',
+    texture: "Coarse volcanic sandpaper",
+    taste: "Crisp seasoned pizza combined with tangy cheese Doritos",
+    mouthfeel: "Crunchy, salty, and sharp",
+    icon: "🌋"
+  },
+  {
+    id: 'airy',
+    texture: "Light airy morning mist",
+    taste: "Sweet peach iced tea combined with fresh eucalyptus mint",
+    mouthfeel: "Cooling, sweet, and refreshing",
+    icon: "💨"
+  }
+];
 
 export function getSynestheticProfile(summary: any): SynestheticProfile {
   const f0 = summary?.f0?.mean || 0;
@@ -156,6 +201,7 @@ export function getSynestheticProfile(summary: any): SynestheticProfile {
   // 1. Extreme Secondary Modifiers: Whispers and Screams/Extremely Harsh Speech
   if (rms < 0.035 && flatness > 0.45) {
     return {
+      id: 'airy',
       texture: "Light airy morning mist",
       taste: "Sweet peach iced tea combined with fresh eucalyptus mint",
       mouthfeel: "Cooling, sweet, and refreshing"
@@ -164,6 +210,7 @@ export function getSynestheticProfile(summary: any): SynestheticProfile {
   
   if (centroid > 0.55 && jitter > 0.06) {
     return {
+      id: 'spiky',
       texture: "Coarse volcanic sandpaper",
       taste: "Crisp seasoned pizza combined with tangy cheese Doritos",
       mouthfeel: "Crunchy, salty, and sharp"
@@ -173,6 +220,7 @@ export function getSynestheticProfile(summary: any): SynestheticProfile {
   // 2. Primary Vocal Dimorphism: Deep Male (Maple Syrup) vs. Bright Female (Crystalline Glass)
   if (f0 > 0 && f0 < 145 && centroid < 0.38) {
     return {
+      id: 'viscous',
       texture: "Thick golden maple syrup",
       taste: "Earthy pinto beans with ground cumin and dry desert dust",
       mouthfeel: "Powdery, dry, and highly savory"
@@ -181,6 +229,7 @@ export function getSynestheticProfile(summary: any): SynestheticProfile {
   
   if (f0 >= 145 && centroid >= 0.38) {
     return {
+      id: 'crisp',
       texture: "Brittle crystalline glass",
       taste: "Tangy tomato slices on thin salted butter crackers",
       mouthfeel: "Crisp, clean, and mildly tart"
@@ -189,6 +238,7 @@ export function getSynestheticProfile(summary: any): SynestheticProfile {
 
   // 3. Default Balanced Voice Profile
   return {
+    id: 'fluid',
     texture: "Warm liquid velvet",
     taste: "Warm buttered crusty bread soaked in rich tomato soup",
     mouthfeel: "Creamy, comforting, and highly viscous"
