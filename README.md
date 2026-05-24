@@ -5,8 +5,6 @@ Built for the **Google I/O DeepMind Hackathon 2026**, **Color My Voice** turns h
 
 ---
 
-## Impact Potential (20%) & Real-World Utility
-
 ### Why We Built It & Who It Is For
 In cognitive science and speech therapy, **vocal prosody**—the rhythm, stress, and intonation of speech—is known as the "music of language." It carries our emotional intent, yet traditional studies on cross-modal perception (synesthesia) have been bottlenecked by small, Western-centric laboratory cohorts due to high hardware and test friction. 
 
